@@ -398,6 +398,8 @@ footer.app-footer{text-align:center;padding:24px 0 18px;color:var(--muted);font-
               <option value="all">All Programs</option>
             </select>
             <button class="btn btn-gold btn-sm" onclick="calcResults()">🔄 Calculate</button>
+            <button class="btn btn-outline btn-sm" onclick="printResults()" title="Print / Save PDF">🖨️ Print</button>
+            <button class="btn btn-outline btn-sm" onclick="downloadResultsPDF()" title="Download as HTML" style="border-color:rgba(0,229,122,.3);color:var(--green)">⬇️ Download</button>
           </div>
         </div>
         <div id="resultsContent"></div>
@@ -561,6 +563,7 @@ function doLogin(){
   document.getElementById('navSettings').style.display=isAdmin?'flex':'none';
   document.getElementById('loginPage').style.display='none';
   document.getElementById('appShell').style.display='block';
+  history.pushState({loggedIn:true},'');
   document.getElementById('sUname').textContent=u;
   document.getElementById('sAvatar').textContent=u[0].toUpperCase();
   document.getElementById('sRole').textContent=isAdmin?'ADMINISTRATOR':'USER';
@@ -619,7 +622,8 @@ function showLoginToast(msg){
   setTimeout(()=>{t.style.opacity='0';},3000);
 }
 document.getElementById('liUser').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('liPass').focus()});
-function doLogout(){curUser=null;document.getElementById('appShell').style.display='none';document.getElementById('loginPage').style.display='flex';document.getElementById('liUser').value='';document.getElementById('liPass').value='';document.getElementById('loginError').style.display='none'}
+function doLogout(){curUser=null;document.getElementById('appShell').style.display='none';document.getElementById('loginPage').style.display='flex';document.getElementById('liUser').value='';document.getElementById('liPass').value='';document.getElementById('loginError').style.display='none';}
+window.addEventListener('popstate',function(){if(curUser){history.pushState({loggedIn:true},'');}else{document.getElementById('appShell').style.display='none';document.getElementById('loginPage').style.display='flex';}});
 
 function updateClock(){
   const n=new Date();
@@ -768,6 +772,78 @@ function renderParticipants(){
     }).join('')}
     </tbody></table></div>
     <div style="font-size:.72rem;color:var(--muted);font-family:'Space Mono',monospace;margin-top:10px;padding:0 4px">${list.length} of ${parts.length} participants shown</div>`;
+}
+
+// ═══ PRINT / DOWNLOAD ═══
+function printResults(){
+  const rc=document.getElementById('resultsContent');
+  if(!rc||!rc.innerHTML.trim()){showToast('ആദ്യം Calculate ചെയ്യുക!',true);return;}
+  const w=window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>ProResult — Results</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;600;700&family=Space+Mono&display=swap');
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:#fff;color:#111;font-family:'DM Sans',sans-serif;padding:24px}
+    h2,h3{font-family:'Bebas Neue',cursive;letter-spacing:2px}
+    .print-header{text-align:center;margin-bottom:24px;border-bottom:2px solid #111;padding-bottom:14px}
+    .print-header h1{font-family:'Bebas Neue',cursive;font-size:2.2rem;letter-spacing:4px}
+    .print-header p{font-size:.8rem;color:#555;font-family:'Space Mono',monospace;margin-top:4px}
+    .card{border:1px solid #ddd;border-radius:10px;padding:16px;margin-bottom:16px}
+    .card-title{font-family:'Bebas Neue',cursive;letter-spacing:2px;font-size:1rem;margin-bottom:12px;color:#333}
+    table{width:100%;border-collapse:collapse;font-size:.82rem}
+    th{background:#f0f0f0;padding:8px 10px;text-align:left;font-family:'Space Mono',monospace;font-size:.7rem;letter-spacing:1px}
+    td{padding:7px 10px;border-bottom:1px solid #eee}
+    .podium-wrap{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;padding:12px 0}
+    .podium-block{border:1px solid #ddd;border-radius:10px;padding:12px;text-align:center;min-width:90px}
+    .podium-block.rank-1{border-color:gold;background:#fffde7}
+    .rank-badge{font-size:1.4rem}
+    .score-val{font-family:'Space Mono',monospace;font-weight:700;font-size:1.1rem}
+    @media print{body{padding:12px}}
+  </style></head><body>
+  <div class="print-header">
+    <h1>🏆 ProResult</h1>
+    <p>COMPETITION RESULTS · ${new Date().toLocaleDateString('ml-IN',{year:'numeric',month:'long',day:'numeric'})}</p>
+  </div>
+  ${rc.innerHTML}
+  </body></html>`);
+  w.document.close();
+  w.focus();
+  setTimeout(()=>w.print(),600);
+}
+function downloadResultsPDF(){
+  const rc=document.getElementById('resultsContent');
+  if(!rc||!rc.innerHTML.trim()){showToast('ആദ്യം Calculate ചെയ്യുക!',true);return;}
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>ProResult-Results</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;600;700&family=Space+Mono&display=swap');
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:#0f0f13;color:#e8e8f0;font-family:'DM Sans',sans-serif;padding:24px}
+    h2,h3,.card-title{font-family:'Bebas Neue',cursive;letter-spacing:2px}
+    .print-header{text-align:center;margin-bottom:24px;border-bottom:1px solid rgba(255,255,255,.1);padding-bottom:14px}
+    .print-header h1{font-family:'Bebas Neue',cursive;font-size:2.2rem;letter-spacing:4px;color:#a78bfa}
+    .print-header p{font-size:.78rem;color:#888;font-family:'Space Mono',monospace;margin-top:4px}
+    .card{background:#1a1a2e;border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:16px;margin-bottom:16px}
+    .card-title{font-size:1rem;margin-bottom:12px;color:#a78bfa}
+    table{width:100%;border-collapse:collapse;font-size:.82rem}
+    th{background:rgba(255,255,255,.05);padding:8px 10px;text-align:left;font-family:'Space Mono',monospace;font-size:.68rem;letter-spacing:1px;color:#aaa}
+    td{padding:7px 10px;border-bottom:1px solid rgba(255,255,255,.05);color:#e8e8f0}
+    .podium-wrap{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;padding:12px 0}
+    .podium-block{background:#252540;border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px;text-align:center;min-width:90px}
+    .podium-block.rank-1{border-color:rgba(255,215,0,.4);background:rgba(255,215,0,.07)}
+    .score-val{font-family:'Space Mono',monospace;font-weight:700;font-size:1.1rem;color:#ffd700}
+  </style></head><body>
+  <div class="print-header">
+    <h1>🏆 ProResult</h1>
+    <p>COMPETITION RESULTS · ${new Date().toLocaleDateString('ml-IN',{year:'numeric',month:'long',day:'numeric'})}</p>
+  </div>
+  ${rc.innerHTML}
+  </body></html>`;
+  const blob=new Blob([html],{type:'text/html'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='ProResult-'+new Date().toISOString().slice(0,10)+'.html';
+  a.click();
+  showToast('Download ആരംഭിച്ചു ✓');
 }
 
 // ═══ CATEGORIES ═══
