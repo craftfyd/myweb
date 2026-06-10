@@ -404,7 +404,7 @@ footer.app-footer{text-align:center;padding:24px 0 18px;color:var(--muted);font-
             </select>
             <button class="btn btn-gold btn-sm" onclick="calcResults()">🔄 Calculate</button>
             <button class="btn btn-outline btn-sm" onclick="printResults()" title="Print / Save PDF">🖨️ Print</button>
-            <button class="btn btn-outline btn-sm" onclick="downloadResultsPDF()" title="Download as HTML" style="border-color:rgba(0,229,122,.3);color:var(--green)">⬇️ Download</button>
+            <button class="btn btn-outline btn-sm" onclick="downloadResultsPDF()" title="Save as PDF" style="border-color:rgba(0,229,122,.3);color:var(--green)">⬇️ Save PDF</button>
           </div>
         </div>
         <div id="resultsContent"></div>
@@ -979,7 +979,7 @@ function printResults(){
   </style></head><body>
   <div class="print-header">
     <h1>🏆 ProResult</h1>
-    <p>COMPETITION RESULTS · ${new Date().toLocaleDateString('ml-IN',{year:'numeric',month:'long',day:'numeric'})}</p>
+    <p>COMPETITION RESULTS · ${new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})}</p>
   </div>
   ${rc.innerHTML}
   </body></html>`);
@@ -989,45 +989,44 @@ function printResults(){
 }
 function downloadResultsPDF(){
   const rc=document.getElementById('resultsContent');
-  if(!rc||!rc.innerHTML.trim()){showToast('ആദ്യം Calculate ചെയ്യുക!',true);return;}
-  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>ProResult-Results</title>
+  if(!rc||!rc.innerHTML.trim()){showToast('First click Calculate!',true);return;}
+  const w=window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>ProResult — Results</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;600;700&family=Space+Mono&display=swap" rel="stylesheet">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;600;700&family=Space+Mono&display=swap');
     *{box-sizing:border-box;margin:0;padding:0}
-    body{background:#fff;color:#111;font-family:'DM Sans',sans-serif;padding:28px;max-width:800px;margin:0 auto}
+    body{background:#fff;color:#111;font-family:'DM Sans',sans-serif;padding:24px;max-width:820px;margin:0 auto}
     h2,h3{font-family:'Bebas Neue',cursive;letter-spacing:2px}
-    .print-header{text-align:center;margin-bottom:24px;border-bottom:2px solid #111;padding-bottom:16px}
-    .print-header h1{font-family:'Bebas Neue',cursive;font-size:2.4rem;letter-spacing:5px;color:#111}
-    .print-header p{font-size:.78rem;color:#666;font-family:'Space Mono',monospace;margin-top:4px}
-    .card{background:#fafafa;border:1px solid #ddd;border-radius:10px;padding:18px;margin-bottom:16px}
-    .card-title{font-family:'Bebas Neue',cursive;font-size:1rem;letter-spacing:2px;margin-bottom:12px;color:#333;border-bottom:1px solid #eee;padding-bottom:6px}
-    table{width:100%;border-collapse:collapse;font-size:.83rem}
-    th{background:#f0f0f0;padding:8px 10px;text-align:left;font-family:'Space Mono',monospace;font-size:.68rem;letter-spacing:1px;color:#555;border-bottom:2px solid #ddd}
-    td{padding:8px 10px;border-bottom:1px solid #eee;color:#222}
+    .print-header{text-align:center;margin-bottom:22px;border-bottom:2px solid #111;padding-bottom:14px}
+    .print-header h1{font-family:'Bebas Neue',cursive;font-size:2.2rem;letter-spacing:5px;color:#111}
+    .print-header p{font-size:.75rem;color:#666;font-family:'Space Mono',monospace;margin-top:4px;letter-spacing:1px}
+    .card{background:#fafafa;border:1px solid #ddd;border-radius:10px;padding:16px;margin-bottom:14px}
+    .card-title{font-family:'Bebas Neue',cursive;font-size:.95rem;letter-spacing:2px;margin-bottom:10px;color:#333;border-bottom:1px solid #eee;padding-bottom:5px}
+    table{width:100%;border-collapse:collapse;font-size:.81rem}
+    th{background:#f0f0f0;padding:7px 9px;text-align:left;font-family:'Space Mono',monospace;font-size:.66rem;letter-spacing:1px;color:#555;border-bottom:2px solid #ddd}
+    td{padding:7px 9px;border-bottom:1px solid #eee;color:#222}
     tr:nth-child(even) td{background:#f9f9f9}
-    .podium-wrap{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;padding:14px 0}
-    .podium-block{background:#fff;border:1.5px solid #ddd;border-radius:12px;padding:14px;text-align:center;min-width:100px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
-    .podium-block.rank-1{border-color:#f0c040;background:#fffde7}
-    .podium-block.rank-2{border-color:#bbb}
+    .podium-wrap{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;padding:12px 0}
+    .podium-block{background:#fff;border:1.5px solid #ddd;border-radius:10px;padding:12px;text-align:center;min-width:90px;box-shadow:0 2px 6px rgba(0,0,0,.06)}
+    .podium-block.rank-1{border-color:#c8960c;background:#fffde7}
+    .podium-block.rank-2{border-color:#aaa}
     .podium-block.rank-3{border-color:#cd7f32}
-    .rank-badge{font-size:1.6rem}
-    .score-val{font-family:'Space Mono',monospace;font-weight:700;font-size:1.1rem;color:#333}
-    .mem-cat-tag{display:inline-block;padding:2px 8px;border-radius:20px;font-size:.7rem;background:#eee;color:#333;margin:1px}
-    @media print{body{padding:10px}.card{break-inside:avoid}}
+    .rank-badge{font-size:1.5rem}
+    .score-val{font-family:'Space Mono',monospace;font-weight:700;font-size:1rem;color:#333}
+    .mem-cat-tag{display:inline-block;padding:2px 7px;border-radius:20px;font-size:.68rem;background:#eee;color:#333;margin:1px}
+    .footer-note{text-align:center;margin-top:20px;font-size:.62rem;color:#bbb;font-family:'Space Mono',monospace;letter-spacing:1px}
+    @media print{body{padding:8px}.card{break-inside:avoid}button{display:none}}
   </style></head><body>
   <div class="print-header">
-    <h1>🏆 ProResult</h1>
-    <p>COMPETITION RESULTS &nbsp;·&nbsp; ${new Date().toLocaleDateString('ml-IN',{year:'numeric',month:'long',day:'numeric'})}</p>
+    <h1>ProResult</h1>
+    <p>COMPETITION RESULTS &nbsp;·&nbsp; ${new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})}</p>
   </div>
   ${rc.innerHTML}
-  <div style="text-align:center;margin-top:24px;font-size:.65rem;color:#aaa;font-family:'Space Mono',monospace">Generated by ProResult · Dezign Hub 2026</div>
-  </body></html>`;
-  const blob=new Blob([html],{type:'text/html'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  a.download='ProResult-Results-'+new Date().toISOString().slice(0,10)+'.html';
-  a.click();
-  showToast('Download ആരംഭിച്ചു ✓ (Browser → Print → Save as PDF)');
+  <div class="footer-note">GENERATED BY PRORESULT · DEZIGN HUB 2026</div>
+  <script>window.onload=()=>{setTimeout(()=>window.print(),700);}<\/script>
+  </body></html>`);
+  w.document.close();w.focus();
+  showToast('Print dialog opening — choose Save as PDF');
 }
 
 // ═══ CATEGORIES ═══
@@ -1414,7 +1413,7 @@ function buildStudentPosterHTML() {
   const eventName = document.getElementById('spEvent')?.value || 'Event 2026';
   const org = document.getElementById('spOrg')?.value || '';
   const dateVal = document.getElementById('spDate')?.value;
-  const dateStr = dateVal ? new Date(dateVal).toLocaleDateString('ml-IN', { year: 'numeric', month: 'long', day: 'numeric' }) : '';
+  const dateStr = dateVal ? new Date(dateVal).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '';
   const theme = document.getElementById('spTheme')?.value || 'gold';
   const accent = document.getElementById('spAccent')?.value || '#6C63FF';
   const bgOpacity = parseInt(document.getElementById('spBgOpacity')?.value || 60);
@@ -1508,19 +1507,26 @@ function buildStudentPosterHTML() {
 }
 
 function downloadStudentPoster() {
-  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Student Result Poster</title>
+  const isDark = ['gold','dark','green','gradient'].includes(document.getElementById('spTheme')?.value || 'gold');
+  const posterHTML = buildStudentPosterHTML();
+  const w = window.open('', '_blank');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Student Result Poster</title>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;600;700&family=Space+Mono&display=swap" rel="stylesheet">
-  <style>*{box-sizing:border-box;margin:0;padding:0}body{background:#1a1a2e;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
-  .wrap{width:380px;border-radius:16px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.5)}
-  @media print{body{background:white;padding:0}.wrap{box-shadow:none;width:100%;border-radius:0}}</style>
-  </head><body><div class="wrap">${buildStudentPosterHTML()}</div>
-  <script>window.onload=()=>setTimeout(()=>window.print(),700)<\/script></body></html>`;
-  const blob = new Blob([html], { type: 'text/html' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'StudentPoster-' + (document.getElementById('spName')?.value || 'result').replace(/[^a-z0-9]/gi, '_') + '.html';
-  a.click();
-  showToast('Download started. Open file → Print → Save as PDF');
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:${isDark?'#111':'#e8e8e8'};display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+    .wrap{width:400px;border-radius:18px;overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,.5)}
+    @media print{
+      *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+      body{background:white;padding:0;display:block}
+      .wrap{box-shadow:none;width:100%;border-radius:0;max-width:100%}
+    }
+  </style>
+  </head><body><div class="wrap">${posterHTML}</div>
+  <script>window.onload=()=>{setTimeout(()=>window.print(),700);}<\/script>
+  </body></html>`);
+  w.document.close(); w.focus();
+  showToast('Print dialog opening — choose Save as PDF');
 }
 
 function printStudentPoster() {
@@ -1551,7 +1557,7 @@ function renderTemplateGrid(){
   const eventName=document.getElementById('tplEventName')?.value||'Competition 2026';
   const org=document.getElementById('tplOrg')?.value||'';
   const dateVal=document.getElementById('tplDate')?.value;
-  const dateStr=dateVal?new Date(dateVal).toLocaleDateString('ml-IN',{year:'numeric',month:'long',day:'numeric'}):new Date().toLocaleDateString('ml-IN',{year:'numeric',month:'long',day:'numeric'});
+  const dateStr=dateVal?new Date(dateVal).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}):new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
   const list=pid==='all'?progs:progs.filter(p=>p.id===pid||p.id==pid);
   if(!list.length){grid.innerHTML=`<div class="empty-state"><div class="ei">🎨</div><p>Programs ഇല്ല. Programs section-ൽ ചേർക്കുക.</p></div>`;return;}
   grid.innerHTML=list.map(p=>{
@@ -1614,7 +1620,7 @@ function downloadPoster(pid, pname){
   const eventName=document.getElementById('tplEventName')?.value||'Competition 2026';
   const org=document.getElementById('tplOrg')?.value||'';
   const dateVal=document.getElementById('tplDate')?.value;
-  const dateStr=dateVal?new Date(dateVal).toLocaleDateString('ml-IN',{year:'numeric',month:'long',day:'numeric'}):new Date().toLocaleDateString('ml-IN',{year:'numeric',month:'long',day:'numeric'});
+  const dateStr=dateVal?new Date(dateVal).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}):new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
   const p=progs.find(x=>x.id==pid||x.id===pid);
   if(!p) return;
   const ranked=teams.map(t=>{const ms=getMProg(p.id,t.id);return{...t,total:ms.reduce((s,m)=>s+m.score,0)};}).filter(t=>t.total>0).sort((a,b)=>b.total-a.total);
@@ -1625,15 +1631,13 @@ function downloadPoster(pid, pname){
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;600;700&family=Space+Mono&display=swap" rel="stylesheet">
   <style>*{box-sizing:border-box;margin:0;padding:0}body{background:${isDark?'#111':'#f0f0f0'};display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
   .wrap{width:360px;border-radius:16px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.3)}
-  @media print{body{background:white;padding:0}.wrap{box-shadow:none;width:100%}}</style>
+  @media print{*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}body{background:white;padding:0;display:block}.wrap{box-shadow:none;width:100%;border-radius:0}}</style>
   </head><body><div class="wrap">${posterHTML}</div>
   <script>window.onload=()=>setTimeout(()=>window.print(),700)<\/script></body></html>`;
-  const blob=new Blob([html],{type:'text/html'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  a.download='Poster-'+pname.replace(/[^a-z0-9]/gi,'_')+'.html';
-  a.click();
-  showToast('Download started');
+  const w2=window.open('','_blank');
+  w2.document.write(html);
+  w2.document.close();w2.focus();
+  showToast('Print dialog opening — choose Save as PDF');
 }
 
 function printPoster(pid, pname){
@@ -1642,7 +1646,7 @@ function printPoster(pid, pname){
   const eventName=document.getElementById('tplEventName')?.value||'Competition 2026';
   const org=document.getElementById('tplOrg')?.value||'';
   const dateVal=document.getElementById('tplDate')?.value;
-  const dateStr=dateVal?new Date(dateVal).toLocaleDateString('ml-IN',{year:'numeric',month:'long',day:'numeric'}):new Date().toLocaleDateString('ml-IN',{year:'numeric',month:'long',day:'numeric'});
+  const dateStr=dateVal?new Date(dateVal).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}):new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
   const p=progs.find(x=>x.id==pid||x.id===pid);
   if(!p) return;
   const ranked=teams.map(t=>{const ms=getMProg(p.id,t.id);return{...t,total:ms.reduce((s,m)=>s+m.score,0)};}).filter(t=>t.total>0).sort((a,b)=>b.total-a.total);
